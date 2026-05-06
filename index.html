@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lab4</title>
+  </head>
+
+  <body>
+    <div class="auth-container">
+        <section class="auth-box">
+            <h2>Skapa konto</h2>
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="reg-username">Användarnamn</label>
+                    <input type="text" id="reg-username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="reg-password">Lösenord</label>
+                    <input type="password" id="reg-password" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Registrera</button>
+            </form>
+            <p id="reg-message"></p>
+        </section>
+
+        <hr> 
+
+        <section class="auth-box">
+            <h2>Logga in</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="login-username">Användarnamn</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Lösenord</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit" class="btn-secondary">Logga in</button>
+            </form>
+            <p id="login-message"></p>
+        </section>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
