@@ -1,5 +1,5 @@
 "use strict";
 
 if(!localStorage.getItem("token")) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 }

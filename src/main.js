@@ -6,10 +6,6 @@ const menu = document.getElementById("menu");
 const loginForm = document.getElementById("login-form");
 const registerForm = document.getElementById("registerForm");
 
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-});
-
 function init() {
   changeMenu();
 
@@ -17,22 +13,64 @@ function init() {
     loginForm.addEventListener("submit", loginUser);
   }
 
-  // if() {
+  if (registerForm) {
+    registerForm.addEventListener("submit", registerUser);
+  }
+}
 
-  // }
+async function registerUser(e) {
+  e.preventDefault();
+
+  const info = document.getElementById("info");
+
+  const usernameInput = document.getElementById("reg-username").value;
+  const passwordInput = document.getElementById("reg-password").value;
+
+  if (!usernameInput || !passwordInput) {
+    info.innerHTML = `<p style="color: orange;">Båda fälten måste fyllas i!</p>`;
+    return;
+  }
+
+  if (!passwordInput.toLowerCase().startsWith("katt")) {
+    info.innerHTML = `<p style="color: orange;">Lösenord måste börja på "katt"!</p>`;
+    return;
+  }
+
+  const newUser = {
+    username: usernameInput,
+    password: passwordInput,
+  };
+
+  try {
+    const resp = await fetch("http://localhost:3000/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser),
+    });
+
+    if (resp.ok) {
+      const info = document.getElementById("info");
+      info.innerHTML = `<p style="color: green; font-weight: bold;">Registrering lyckades! Du kan nu logga in.</p>`;
+    } else {
+      const errorData = await resp.json();
+      document.getElementById("info").innerHTML =
+        `<p style="color: red;">${errorData.message || "Kunde inte registrera användare."}</p>`;
+    }
+  } catch (error) {
+    console.log("Kopplingsfel till servern.");
+  }
 }
 
 function changeMenu() {
   if (localStorage.getItem("token")) {
     menu.innerHTML = `
-        <li><a href="index.html" id=""> --- </a></li>
+        <li><a href="index.html" id="index-link">Start</a></li>
         <li><a href="admin.html" id="admin-link">Admin</a></li>
         <li><button id="logout-button" class="logout-button">Logga ut</button></li>
         `;
   } else {
     menu.innerHTML = `
-        <li><a href="index.html" id=""> --- </a></li>
-        <li><a href="login.html" id="login-button" class="auth-button">Logga in</a></li>
+        <li><a href="index.html" id="">Start</a></li>
         `;
   }
 
@@ -41,7 +79,7 @@ function changeMenu() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       localStorage.removeItem("token");
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     });
   }
 }
@@ -49,11 +87,12 @@ function changeMenu() {
 async function loginUser(e) {
   e.preventDefault();
 
-  let usernamelInput = document.getElementById("username").value;
-  let passwordInput = document.getElementById("password").value;
+  let usernamelInput = document.getElementById("login-username").value;
+  let passwordInput = document.getElementById("login-password").value;
 
   if (!usernamelInput || !passwordInput) {
-    console.log("Fyll i alla fält!");
+    document.getElementById("info").innerHTML =
+      `<p style="color: orange;">Alla fält behöver vara ifyllda</p>`;
     return;
   }
 
@@ -63,7 +102,7 @@ async function loginUser(e) {
   };
 
   try {
-    const resp = await fetch("http://localhost:3000/users/login", {
+    const resp = await fetch("http://localhost:3000/api/login", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -74,12 +113,15 @@ async function loginUser(e) {
     if (resp.ok) {
       const data = await resp.json();
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.response.token);
       window.location.href = "admin.html";
     } else {
       throw error;
     }
   } catch (error) {
-    console.log("Felaktigt användarnamn eller lösenord");
+    document.getElementById("info").innerHTML =
+      `<p style="color: red;">Felaktigt användarnamn eller lösenord</p>`;
   }
 }
+
+init();
