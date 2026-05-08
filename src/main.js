@@ -16,6 +16,10 @@ function init() {
   if (registerForm) {
     registerForm.addEventListener("submit", registerUser);
   }
+
+  if (document.getElementById("user-list")) {
+    fetchUsers();
+  }
 }
 
 async function registerUser(e) {
@@ -42,7 +46,7 @@ async function registerUser(e) {
   };
 
   try {
-    const resp = await fetch("http://localhost:3000/api/register", {
+    const resp = await fetch("https://lab4backend-1jj9.onrender.com/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newUser),
@@ -102,7 +106,7 @@ async function loginUser(e) {
   };
 
   try {
-    const resp = await fetch("http://localhost:3000/api/login", {
+    const resp = await fetch("https://lab4backend-1jj9.onrender.com/api/login", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -122,6 +126,55 @@ async function loginUser(e) {
     document.getElementById("info").innerHTML =
       `<p style="color: red;">Felaktigt användarnamn eller lösenord</p>`;
   }
+}
+
+async function fetchUsers() {
+  const userListContainer = document.getElementById("user-list");
+  if (!userListContainer) return;
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const resp = await fetch("https://lab4backend-1jj9.onrender.com/api/protected", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (resp.ok) {
+      const result = await resp.json();
+      displayUsers(result.data); // Skicka vidare data till renderfunktionen
+    } else {
+      userListContainer.innerHTML = "<p>Något gick fel, pröva igen</p>";
+    }
+  } catch (error) {
+    console.error("Fel vid hämtning:", error);
+  }
+}
+
+function displayUsers(users) {
+  const userListContainer = document.getElementById("user-list");
+
+  if (users.length === 0) {
+    userListContainer.innerHTML = "<p>Inga användare hittades.</p>";
+    return;
+  }
+
+  // Skapa en tabell eller lista
+  let html = "";
+
+  users.forEach((user) => {
+    html += `
+    <div>
+      <p><strong>Användare: </strong>${user.username}</p>
+      <p><strong>Skapad: </strong>${user.created}</p>
+    </div>
+    `;
+  });
+
+  userListContainer.innerHTML = html;
 }
 
 init();
